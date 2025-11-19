@@ -50,7 +50,7 @@ flir-batch-extractor /path/to/some/jpgs/ ./myoutputs/ --color --csv
 Outputs:
 
 ```
-results/
+myoutputs/
   rgb/
   thermal/
   thermal_color/
@@ -60,10 +60,9 @@ results/
 
 
 ## 16 bit thermal PNG enoding details:
-The thermal/\*.png files are encoded as 16-bit PNGs. Kind of similar to what I've seen from FlirStudio for some of their other cams. Image values are linear in centi-degrees, such that if you normalize to a 0-100 scale, pixel values should read as their actual temperatures.
+The thermal/\*.png files are encoded as 16-bit PNGs. Essentially the behavior I've seen from FlirStudio when you export thermal as 16-bit PNGs. Image values are linear in centi-degrees, such that if you normalize to a 0-100 scale, pixel values should read as their actual measured temperatures.
 
-TODO: add pics.
-
+<img width="1520" height="1198" alt="image" src="https://github.com/user-attachments/assets/f21f4c42-de91-486d-954f-fcdc680f28c8" />
 
 ## Credits
 

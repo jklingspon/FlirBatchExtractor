@@ -1,73 +1,73 @@
-# Flir Image Extractor
+# Flir Batch Extractor
 
-FLIR® thermal cameras like the FLIR ONE® include both a thermal and a visual light camera.
-The latter is used to enhance the thermal image using an edge detector.
-
-The resulting image is saved as a jpg image but both the original visual image and the raw thermal sensor data are embedded in the jpg metadata.
-
-This small Python tool/library allows to extract the original photo and thermal sensor values converted to temperatures.
+A wrapper tool for extracting RGB, 16-bit Thermal, and raw CSV from a directory full of FLIR ONE® images.
 
 ## Requirements
 
-This tool relies on `exiftool`. It should be available in most Linux distributions (e.g. as `perl-image-exiftool` in Arch Linux or `libimage-exiftool-perl` in Debian and Ubuntu).
+- Python ≥ 3.8  
+- numpy  
+- pillow  
+- matplotlib  
+- tqdm  
+- exiftool
 
-It also needs the Python packages *numpy* and *matplotlib* (the latter only if used interactively).
-
-```bash
-# sudo apt update
-# sudo apt install exiftool python-setuptools
-# sudo pip install numpy matplotlib pillow 
-```
+To install exiftool, see: https://exiftool.org/install.html
+This script expects it to be in your PATH.
 
 ## Usage
 
-This module can be used by importing it:
+```bash
+    flir-batch-extractor INPUT [OUTPUT] [--color] [--csv]
+ 
+INPUT:
+    Path to a FLIR JPEG file or a directory containing such files.
+ 
+OUTPUT (optional):
+    Output directory (default: {working directory}/out).
+ 
+Optional:
+    --color    Also save colormapped thermal PNGs in {out_dir}/thermal_color/
+    --csv      Also save raw Celsius matrices in {out_dir}/csv/
 
-```python
-import flir_image_extractor
-fir = flir_image_extractor.FlirImageExtractor()
-fir.process_image('examples/ax8.jpg')
-fir.plot()
 ```
 
-Or by calling it as a script:
+## Output Sturecture
+```bash
+    {out_dir}/rgb/*.png            – embedded RGB images (8-bit)
+    {out_dir}/thermal/*.png        – thermal images (16-bit gray, linear in °C)
+    {out_dir}/thermal_color/*.png  – colormapped thermal images (if --color)
+    {out_dir}/csv/*.csv            – raw per-pixel °C values (if --csv)
+    {out_dir}/meta.json            – all metadata
+```
+
+## Examples
+
 
 ```bash
-python flir_image_extractor.py -p -i 'examples/zenmuse_xtr.jpg'
+flir-batch-extractor /path/to/some/jpgs/ ./myoutputs/ --color --csv
 ```
 
-```bash
-usage: flir_image_extractor.py [-h] -i INPUT [-p] [-exif EXIFTOOL]
-                               [-csv EXTRACTCSV] [-d]
+Outputs:
 
-Extract and visualize Flir Image data
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -i INPUT, --input INPUT
-                        Input image. Ex. img.jpg
-  -p, --plot            Generate a plot using matplotlib
-  -exif EXIFTOOL, --exiftool EXIFTOOL
-                        Custom path to exiftool
-  -csv EXTRACTCSV, --extractcsv EXTRACTCSV
-                        Export the thermal data per pixel encoded as csv file
-  -d, --debug           Set the debug flag
+```
+results/
+  rgb/
+  thermal/
+  thermal_color/
+  csv/
+  meta.json
 ```
 
-This command will show an interactive plot of the thermal image using matplotlib and create two image files *flir_example_thermal.png* and *flir_example_rgb_image.jpg*. 
-Both are RGB images, the original temperature array is available using the `get_thermal_np` or `export_thermal_to_csv` functions.
 
-The functions `get_rgb_np` and `get_thermal_np` yield numpy arrays and can be called from your own script after importing this lib.
+## 16 bit thermal PNG enoding details:
+The thermal/\*.png files are encoded as 16-bit PNGs. Kind of similar to what I've seen from FlirStudio for some of their other cams. Image values are linear in centi-degrees, such that if you normalize to a 0-100 scale, pixel values should read as their actual temperatures.
 
-## Supported/Tested cameras:
+TODO: add pics.
 
-- Flir One (thermal + RGB)
-- Xenmuse XTR (thermal + thumbnail, set the subject distance to 1 meter)
-- AX8 (thermal + RGB)
-
-Other cameras might need some small tweaks (the embedded raw data can be in multiple image formats)
 
 ## Credits
+
+FlirImageExtractor is forked from https://github.com/ITVRoC/FlirImageExtractor
 
 Raw value to temperature conversion is ported from this R package: https://github.com/gtatters/Thermimage/blob/master/R/raw2temp.R
 Original Python code from: https://github.com/Nervengift/read_thermal.py

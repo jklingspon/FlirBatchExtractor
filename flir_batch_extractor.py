@@ -153,7 +153,7 @@ def save_csv(arr_celsius: np.ndarray, out: Path):
 def main():
     args = parse_args()
 
-    in = Path(args.input_path).expanduser().resolve()
+    in_path = Path(args.input_path).expanduser().resolve()
     out_base = (
         Path(args.output_dir).expanduser().resolve()
         if args.output_dir else Path.cwd() / "out"
@@ -163,9 +163,9 @@ def main():
         out_base, want_color=args.color, want_csv=args.csv
     )
 
-    imgs = list_images(in)
+    imgs = list_images(in_path)
     if not imgs:
-        print(f"ERROR: No images found in {in}", file=sys.stderr)
+        print(f"ERROR: No images found in {in_path}", file=sys.stderr)
         sys.exit(1)
 
     flir = FlirImageExtractor()
